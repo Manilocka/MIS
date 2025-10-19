@@ -1,7 +1,3 @@
-"""
-Скрипт для инициализации базы данных с тестовыми данными
-Запускается отдельно для создания и заполнения БД
-"""
 
 from sqlmodel import SQLModel, create_engine, Session, select
 from models import *
@@ -49,8 +45,7 @@ def show_database_info():
         print("Готово к работе!")
 
 if __name__ == "__main__":
-    print("Инициализация музыкальной базы данных")
-    print("=" * 50)
+
     
     try:
         create_database()

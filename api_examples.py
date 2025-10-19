@@ -1,4 +1,4 @@
-import requests
+import database_requests
 import json
 from datetime import datetime
 
@@ -8,7 +8,7 @@ def test_api():
     # 1. Получение всех пользователей
     print("\n1. Получение всех пользователей:")
     try:
-        response = requests.get(f"{BASE_URL}/users")
+        response = database_requests.get(f"{BASE_URL}/users")
         users = response.json()
         print(f"Найдено пользователей: {len(users)}")
         for user in users[:3]: 
@@ -19,7 +19,7 @@ def test_api():
     # 2. Получение всех артистов
     print("\n2. Получение всех артистов:")
     try:
-        response = requests.get(f"{BASE_URL}/artists")
+        response = database_requests.get(f"{BASE_URL}/artists")
         artists = response.json()
         print(f"Найдено артистов: {len(artists)}")
         for artist in artists:
@@ -30,7 +30,7 @@ def test_api():
     # 3. Получение всех песен
     print("\n3. Получение всех песен:")
     try:
-        response = requests.get(f"{BASE_URL}/songs")
+        response = database_requests.get(f"{BASE_URL}/songs")
         songs = response.json()
         print(f"Найдено песен: {len(songs)}")
         for song in songs:
@@ -42,7 +42,7 @@ def test_api():
     # 4. Получение всех жанров
     print("\n4. Получение всех жанров:")
     try:
-        response = requests.get(f"{BASE_URL}/genres")
+        response = database_requests.get(f"{BASE_URL}/genres")
         genres = response.json()
         print(f"Найдено жанров: {len(genres)}")
         for genre in genres:
@@ -61,7 +61,7 @@ def test_api():
             "subscription_type": "free",
             "registration_date": datetime.now().isoformat().split('T')[0]
         }
-        response = requests.post(f"{BASE_URL}/users", json=new_user)
+        response = database_requests.post(f"{BASE_URL}/users", json=new_user)
         if response.status_code == 200:
             user = response.json()
             print(f"  Пользователь создан: {user['username']} (ID: {user['user_id']})")
@@ -77,7 +77,7 @@ def test_api():
             "name": "Rock",
             "description": "Rock music genre"
         }
-        response = requests.post(f"{BASE_URL}/genres", json=new_genre)
+        response = database_requests.post(f"{BASE_URL}/genres", json=new_genre)
         if response.status_code == 200:
             genre = response.json()
             print(f"  Жанр создан: {genre['name']} (ID: {genre['genre_id']})")
@@ -89,7 +89,7 @@ def test_api():
     # 7. Получение песен по жанру
     print("\n7. Получение песен по жанру (Pop):")
     try:
-        response = requests.get(f"{BASE_URL}/genres")
+        response = database_requests.get(f"{BASE_URL}/genres")
         genres = response.json()
         pop_genre_id = None
         for genre in genres:
@@ -98,7 +98,7 @@ def test_api():
                 break
         
         if pop_genre_id:
-            response = requests.get(f"{BASE_URL}/songs/genre/{pop_genre_id}")
+            response = database_requests.get(f"{BASE_URL}/songs/genre/{pop_genre_id}")
             songs = response.json()
             print(f"  Найдено песен в жанре Pop: {len(songs)}")
             for song in songs:
@@ -111,11 +111,11 @@ def test_api():
     # 8. Получение альбомов артиста
     print("\n8. Получение альбомов артиста:")
     try:
-        response = requests.get(f"{BASE_URL}/artists")
+        response = database_requests.get(f"{BASE_URL}/artists")
         artists = response.json()
         if artists:
             artist_id = artists[0]['artist_id']
-            response = requests.get(f"{BASE_URL}/albums/artist/{artist_id}")
+            response = database_requests.get(f"{BASE_URL}/albums/artist/{artist_id}")
             albums = response.json()
             print(f"  Альбомы артиста {artists[0]['name']}: {len(albums)}")
             for album in albums:
