@@ -1,8 +1,6 @@
 from sqlmodel import Field, SQLModel
 
 
-# Note: engine is defined in `database.py`
-
 # class Base(SQLModel, table=False):
 #     __table_args__ = {"schema": "karma"}
 class User(SQLModel, table=True):

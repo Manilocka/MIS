@@ -27,7 +27,7 @@ def init_data():
         
  
         album1 = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=1)
-        album2 = Album(title="ivan paratise", cover_art_url="/static/images/ivan_paratise.jpg", release_date="2024-02-01", artist_id=2)
+        album2 = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=2)
         album3 = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=3)
         session.add_all([album1, album2, album3])
         session.commit()
@@ -35,7 +35,7 @@ def init_data():
    
         song1 = Song(title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
         song2 = Song(title="ivan paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
-        song3 = Song(title="Ivan Song", duration=180, file_url="/static/music/ivan_song.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
+        song3 = Song(title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
         session.add_all([song1, song2, song3])
         session.commit()
         
