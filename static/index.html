@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музыкальная система</title>
+    
+    <!-- Material UI CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>AlienMusic</h1>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('users')">Пользователи</div>
+            <div class="tab" onclick="showTab('artists')">Артисты</div>
+            <div class="tab" onclick="showTab('songs')">Песни</div>
+            <div class="tab" onclick="showTab('albums')">Альбомы</div>
+            <div class="tab" onclick="showTab('playlists')">Плейлисты</div>
+            <div class="tab" onclick="showTab('genres')">Жанры</div>
+        </div>
+        
+        <!-- Пользователи -->
+        <div id="users" class="tab-content active">
+            <div class="card">
+                <div class="card-header">Добавить пользователя</div>
+                <div class="card-content">
+                    <form id="userForm">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="userEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Пароль:</label>
+                            <input type="password" id="userPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Имя пользователя:</label>
+                            <input type="text" id="userUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Дата рождения:</label>
+                            <input type="date" id="userBirthDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Страна:</label>
+                            <input type="text" id="userCountry">
+                        </div>
+                        <button type="submit" class="btn">Добавить пользователя</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список пользователей</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadUsers()">Обновить список</button>
+                    <div id="usersList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Артисты -->
+        <div id="artists" class="tab-content">
+            <div class="card">
+                <div class="card-header">Добавить артиста</div>
+                <div class="card-content">
+                    <form id="artistForm">
+                        <div class="form-group">
+                            <label>Имя артиста:</label>
+                            <input type="text" id="artistName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Биография:</label>
+                            <textarea id="artistBio" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL фото:</label>
+                            <input type="url" id="artistPhoto">
+                        </div>
+                        <div class="form-group">
+                            <label>Жанр:</label>
+                            <select id="artistGenre">
+                                <option value="">Выберите жанр</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Добавить артиста</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список артистов</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadArtists()">Обновить список</button>
+                    <div id="artistsList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Песни -->
+        <div id="songs" class="tab-content">
+            <div class="card">
+                <div class="card-header">Добавить песню</div>
+                <div class="card-content">
+                    <form id="songForm">
+                        <div class="form-group">
+                            <label>Название песни:</label>
+                            <input type="text" id="songTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Длительность (секунды):</label>
+                            <input type="number" id="songDuration" required>
+                        </div>
+                        <div class="form-group">
+                            <label>URL файла:</label>
+                            <input type="url" id="songFileUrl" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Битрейт:</label>
+                            <input type="number" id="songBitrate">
+                        </div>
+                        <div class="form-group">
+                            <label>Дата выпуска:</label>
+                            <input type="date" id="songReleaseDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Альбом:</label>
+                            <select id="songAlbum">
+                                <option value="">Выберите альбом</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Жанр:</label>
+                            <select id="songGenre">
+                                <option value="">Выберите жанр</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Добавить песню</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список песен</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadSongs()">Обновить список</button>
+                    <div id="songsList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Альбомы -->
+        <div id="albums" class="tab-content">
+            <div class="card">
+                <div class="card-header">Добавить альбом</div>
+                <div class="card-content">
+                    <form id="albumForm">
+                        <div class="form-group">
+                            <label>Название альбома:</label>
+                            <input type="text" id="albumTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>URL обложки:</label>
+                            <input type="url" id="albumCover">
+                        </div>
+                        <div class="form-group">
+                            <label>Дата выпуска:</label>
+                            <input type="date" id="albumReleaseDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Артист:</label>
+                            <select id="albumArtist">
+                                <option value="">Выберите артиста</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Добавить альбом</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список альбомов</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadAlbums()">Обновить список</button>
+                    <div id="albumsList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Плейлисты -->
+        <div id="playlists" class="tab-content">
+            <div class="card">
+                <div class="card-header">Добавить плейлист</div>
+                <div class="card-content">
+                    <form id="playlistForm">
+                        <div class="form-group">
+                            <label>Название плейлиста:</label>
+                            <input type="text" id="playlistTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Описание:</label>
+                            <textarea id="playlistDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL обложки:</label>
+                            <input type="url" id="playlistCover">
+                        </div>
+                        <div class="form-group">
+                            <label>Дата создания:</label>
+                            <input type="date" id="playlistCreatedDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Пользователь:</label>
+                            <select id="playlistUser">
+                                <option value="">Выберите пользователя</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Добавить плейлист</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список плейлистов</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadPlaylists()">Обновить список</button>
+                    <div id="playlistsList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Жанры -->
+        <div id="genres" class="tab-content">
+            <div class="card">
+                <div class="card-header">Добавить жанр</div>
+                <div class="card-content">
+                    <form id="genreForm">
+                        <div class="form-group">
+                            <label>Название жанра:</label>
+                            <input type="text" id="genreName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Описание:</label>
+                            <textarea id="genreDescription" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Добавить жанр</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Список жанров</div>
+                <div class="card-content">
+                    <button class="btn" onclick="loadGenres()">Обновить список</button>
+                    <div id="genresList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        
+        // Управление табами
+        function showTab(tabName) {
+            // Скрыть все табы
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать выбранный таб
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Загрузить данные для таба
+            switch(tabName) {
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'artists':
+                    loadArtists();
+                    loadGenres();
+                    break;
+                case 'songs':
+                    loadSongs();
+                    loadAlbums();
+                    loadGenres();
+                    break;
+                case 'albums':
+                    loadAlbums();
+                    loadArtists();
+                    break;
+                case 'playlists':
+                    loadPlaylists();
+                    loadUsers();
+                    break;
+                case 'genres':
+                    loadGenres();
+                    break;
+            }
+        }
+        
+        // Загрузка пользователей
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                showError('Ошибка загрузки пользователей: ' + error.message);
+            }
+        }
+        
+        function displayUsers(users) {
+            const container = document.getElementById('usersList');
+            if (users.length === 0) {
+                container.innerHTML = '<p>Пользователи не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Email</th><th>Имя</th><th>Страна</th><th>Действия</th></tr></thead><tbody>';
+            users.forEach(user => {
+                html += `<tr>
+                    <td>${user.user_id}</td>
+                    <td>${user.email}</td>
+                    <td>${user.username}</td>
+                    <td>${user.country || '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteUser(${user.user_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Загрузка артистов
+        async function loadArtists() {
+            try {
+                const response = await fetch(`${API_BASE}/artists`);
+                const artists = await response.json();
+                displayArtists(artists);
+            } catch (error) {
+                showError('Ошибка загрузки артистов: ' + error.message);
+            }
+        }
+        
+        function displayArtists(artists) {
+            const container = document.getElementById('artistsList');
+            if (artists.length === 0) {
+                container.innerHTML = '<p>Артисты не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Имя</th><th>Биография</th><th>Фото</th><th>Действия</th></tr></thead><tbody>';
+            artists.forEach(artist => {
+                html += `<tr>
+                    <td>${artist.artist_id}</td>
+                    <td>${artist.name}</td>
+                    <td>${artist.bio || '-'}</td>
+                    <td>${artist.photo_url ? `<img src="${artist.photo_url}" width="50" height="50" style="object-fit: cover; border-radius: 4px;">` : '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteArtist(${artist.artist_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Загрузка песен
+        async function loadSongs() {
+            try {
+                const response = await fetch(`${API_BASE}/songs`);
+                const songs = await response.json();
+                displaySongs(songs);
+            } catch (error) {
+                showError('Ошибка загрузки песен: ' + error.message);
+            }
+        }
+        
+        function displaySongs(songs) {
+            const container = document.getElementById('songsList');
+            if (songs.length === 0) {
+                container.innerHTML = '<p>Песни не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Название</th><th>Длительность</th><th>Битрейт</th><th>Дата выпуска</th><th>Действия</th></tr></thead><tbody>';
+            songs.forEach(song => {
+                const duration = Math.floor(song.duration / 60) + ':' + (song.duration % 60).toString().padStart(2, '0');
+                html += `<tr>
+                    <td>${song.song_id}</td>
+                    <td>${song.title}</td>
+                    <td>${duration}</td>
+                    <td>${song.bitrate || '-'}</td>
+                    <td>${song.release_date || '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteSong(${song.song_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Загрузка альбомов
+        async function loadAlbums() {
+            try {
+                const response = await fetch(`${API_BASE}/albums`);
+                const albums = await response.json();
+                displayAlbums(albums);
+            } catch (error) {
+                showError('Ошибка загрузки альбомов: ' + error.message);
+            }
+        }
+        
+        function displayAlbums(albums) {
+            const container = document.getElementById('albumsList');
+            if (albums.length === 0) {
+                container.innerHTML = '<p>Альбомы не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Название</th><th>Дата выпуска</th><th>Обложка</th><th>Действия</th></tr></thead><tbody>';
+            albums.forEach(album => {
+                html += `<tr>
+                    <td>${album.album_id}</td>
+                    <td>${album.title}</td>
+                    <td>${album.release_date || '-'}</td>
+                    <td>${album.cover_art_url ? `<img src="${album.cover_art_url}" width="50" height="50" style="object-fit: cover; border-radius: 4px;">` : '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteAlbum(${album.album_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Загрузка плейлистов
+        async function loadPlaylists() {
+            try {
+                const response = await fetch(`${API_BASE}/playlists`);
+                const playlists = await response.json();
+                displayPlaylists(playlists);
+            } catch (error) {
+                showError('Ошибка загрузки плейлистов: ' + error.message);
+            }
+        }
+        
+        function displayPlaylists(playlists) {
+            const container = document.getElementById('playlistsList');
+            if (playlists.length === 0) {
+                container.innerHTML = '<p>Плейлисты не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Название</th><th>Описание</th><th>Дата создания</th><th>Действия</th></tr></thead><tbody>';
+            playlists.forEach(playlist => {
+                html += `<tr>
+                    <td>${playlist.playlist_id}</td>
+                    <td>${playlist.title}</td>
+                    <td>${playlist.description || '-'}</td>
+                    <td>${playlist.created_date || '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deletePlaylist(${playlist.playlist_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Загрузка жанров
+        async function loadGenres() {
+            try {
+                const response = await fetch(`${API_BASE}/genres`);
+                const genres = await response.json();
+                displayGenres(genres);
+                populateGenreSelects(genres);
+            } catch (error) {
+                showError('Ошибка загрузки жанров: ' + error.message);
+            }
+        }
+        
+        function displayGenres(genres) {
+            const container = document.getElementById('genresList');
+            if (genres.length === 0) {
+                container.innerHTML = '<p>Жанры не найдены</p>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>ID</th><th>Название</th><th>Описание</th><th>Действия</th></tr></thead><tbody>';
+            genres.forEach(genre => {
+                html += `<tr>
+                    <td>${genre.genre_id}</td>
+                    <td>${genre.name}</td>
+                    <td>${genre.description || '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteGenre(${genre.genre_id})">Удалить</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Заполнение селектов
+        function populateGenreSelects(genres) {
+            const selects = ['artistGenre', 'songGenre'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Выберите жанр</option>';
+                    genres.forEach(genre => {
+                        select.innerHTML += `<option value="${genre.genre_id}">${genre.name}</option>`;
+                    });
+                }
+            });
+        }
+        
+        // Обработчики форм
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userData = {
+                email: document.getElementById('userEmail').value,
+                password: document.getElementById('userPassword').value,
+                username: document.getElementById('userUsername').value,
+                date_of_birth: document.getElementById('userBirthDate').value || null,
+                country: document.getElementById('userCountry').value || null,
+                registration_date: new Date().toISOString().split('T')[0]
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Пользователь добавлен');
+                    document.getElementById('userForm').reset();
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        });
+        
+        // Функции удаления
+        async function deleteUser(userId) {
+            if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/users/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Пользователь удален');
+                        loadUsers();
+                    } else {
+                        showError('Ошибка удаления пользователя');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deleteArtist(artistId) {
+            if (confirm('Вы уверены, что хотите удалить этого артиста?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/artists/${artistId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Артист удален');
+                        loadArtists();
+                    } else {
+                        showError('Ошибка удаления артиста');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deleteSong(songId) {
+            if (confirm('Вы уверены, что хотите удалить эту песню?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/songs/${songId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Песня удалена');
+                        loadSongs();
+                    } else {
+                        showError('Ошибка удаления песни');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deleteAlbum(albumId) {
+            if (confirm('Вы уверены, что хотите удалить этот альбом?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/albums/${albumId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Альбом удален');
+                        loadAlbums();
+                    } else {
+                        showError('Ошибка удаления альбома');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deletePlaylist(playlistId) {
+            if (confirm('Вы уверены, что хотите удалить этот плейлист?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/playlists/${playlistId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Плейлист удален');
+                        loadPlaylists();
+                    } else {
+                        showError('Ошибка удаления плейлиста');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deleteGenre(genreId) {
+            if (confirm('Вы уверены, что хотите удалить этот жанр?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/genres/${genreId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        showSuccess('Жанр удален');
+                        loadGenres();
+                    } else {
+                        showError('Ошибка удаления жанра');
+                    }
+                } catch (error) {
+                    showError('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        // Утилиты
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.querySelector('.container').insertBefore(successDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+    </script>
+</body>
+</html>

@@ -1,8 +1,7 @@
-from sqlmodel import Field, SQLModel, create_engine
+from sqlmodel import Field, SQLModel
 
 
-engine = create_engine("sqlite:///./music_db.sqlite")
-# engine = create_engine('postgresql://postgresql:{DB_PASSWORD}@localhost:5432/{DB_NAME}')
+# Note: engine is defined in `database.py`
 
 # class Base(SQLModel, table=False):
 #     __table_args__ = {"schema": "karma"}
@@ -14,7 +13,6 @@ class User(SQLModel, table=True):
     username: str
     date_of_birth: str = Field(default=None)
     country: str = Field(default=None)
-    subscription_type: str = Field(default=None)
     registration_date: str = Field(default=None)
 
 

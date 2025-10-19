@@ -1,8 +1,7 @@
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import SQLModel, Session, select
 from models import *
+from database import engine
 def create_db_and_tables():
-
-    # Base.metadata.create_all(engine)
     SQLModel.metadata.create_all(engine)
 
 def init_data():
@@ -20,35 +19,38 @@ def init_data():
         session.commit()
         
 
-        artist1 = Artist(name="Luka", bio="Pop artist", photo_url="/images/luka.jpg", genre_id=1)
-        artist2 = Artist(name="Hyuona", bio="K-pop artist", photo_url="/images/hyuona.jpg", genre_id=2)
-        session.add_all([artist1, artist2])
+        artist1 = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=1)
+        artist2 = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=2)
+        artist3 = Artist(name="Ivan Kpop", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=2)
+        session.add_all([artist1, artist2, artist3])
         session.commit()
         
  
-        album1 = Album(title="Round 5", cover_art_url="/covers/round5.jpg", release_date="2024-01-01", artist_id=1)
-        album2 = Album(title="B-side", cover_art_url="/covers/bside.jpg", release_date="2024-02-01", artist_id=2)
-        session.add_all([album1, album2])
+        album1 = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=1)
+        album2 = Album(title="ivan paratise", cover_art_url="/static/images/ivan_paratise.jpg", release_date="2024-02-01", artist_id=2)
+        album3 = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=3)
+        session.add_all([album1, album2, album3])
         session.commit()
         
    
-        song1 = Song(title="Ruler of my heart", duration=219, file_url="/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
-        song2 = Song(title="All in", duration=259, file_url="/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
-        session.add_all([song1, song2])
+        song1 = Song(title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
+        song2 = Song(title="ivan paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
+        song3 = Song(title="Ivan Song", duration=180, file_url="/static/music/ivan_song.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
+        session.add_all([song1, song2, song3])
         session.commit()
         
     
-        user1 = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="1990-01-01", country="USA", subscription_type="premium", registration_date="2025-01-01")
-        user2 = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="1992-05-15", country="Canada", subscription_type="free", registration_date="2025-03-04")
-        session.add_all([user1, user2])
+        user1 = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
+        user2 = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
+        user3 = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
+        session.add_all([user1, user2, user3])
         session.commit()
 
        
-        playlist1 = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/playlists/alien_stage.jpg", created_date="2025-01-01", user_id=1)
+        playlist1 = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=1)
         session.add(playlist1)
         session.commit()        
         
-        print("Данные вставлены")
 
 def get_all_users():
     """Получить всех пользователей"""
@@ -94,7 +96,7 @@ def get_user_by_email(email: str):
 
 
 def add_user(email: str, password: str, username: str, date_of_birth: str = None, 
-             country: str = None, subscription_type: str = None, registration_date: str = None):
+             country: str = None, registration_date: str = None):
     """Добавить нового пользователя"""
     with Session(engine) as session:
         user = User(
@@ -103,13 +105,12 @@ def add_user(email: str, password: str, username: str, date_of_birth: str = None
             username=username,
             date_of_birth=date_of_birth,
             country=country,
-            subscription_type=subscription_type,
             registration_date=registration_date
         )
         session.add(user)
         session.commit()
         session.refresh(user)
-        print(f"✅ Пользователь {username} добавлен с ID: {user.user_id}")
+        print(f"Пользователь {username} добавлен с ID: {user.user_id}")
         return user
 
 def add_genre(name: str, description: str = None):
@@ -119,7 +120,7 @@ def add_genre(name: str, description: str = None):
         session.add(genre)
         session.commit()
         session.refresh(genre)
-        print(f"✅ Жанр {name} добавлен с ID: {genre.genre_id}")
+        print(f"Жанр {name} добавлен с ID: {genre.genre_id}")
         return genre
 
 def add_artist(name: str, bio: str = None, photo_url: str = None, genre_id: int = None):
@@ -129,7 +130,7 @@ def add_artist(name: str, bio: str = None, photo_url: str = None, genre_id: int 
         session.add(artist)
         session.commit()
         session.refresh(artist)
-        print(f"✅ Артист {name} добавлен с ID: {artist.artist_id}")
+        print(f"Артист {name} добавлен с ID: {artist.artist_id}")
         return artist
 
 def add_album(title: str, cover_art_url: str = None, release_date: str = None, artist_id: int = None):
@@ -139,7 +140,7 @@ def add_album(title: str, cover_art_url: str = None, release_date: str = None, a
         session.add(album)
         session.commit()
         session.refresh(album)
-        print(f"✅ Альбом {title} добавлен с ID: {album.album_id}")
+        print(f"Альбом {title} добавлен с ID: {album.album_id}")
         return album
 
 def add_song(title: str, duration: int, file_url: str = None, bitrate: int = None, 
@@ -158,7 +159,7 @@ def add_song(title: str, duration: int, file_url: str = None, bitrate: int = Non
         session.add(song)
         session.commit()
         session.refresh(song)
-        print(f"✅ Песня {title} добавлена с ID: {song.song_id}")
+        print(f"Песня {title} добавлена с ID: {song.song_id}")
         return song
 
 def add_playlist(title: str, description: str = None, cover_image_url: str = None, 
@@ -175,7 +176,7 @@ def add_playlist(title: str, description: str = None, cover_image_url: str = Non
         session.add(playlist)
         session.commit()
         session.refresh(playlist)
-        print(f"✅ Плейлист {title} добавлен с ID: {playlist.playlist_id}")
+        print(f"Плейлист {title} добавлен с ID: {playlist.playlist_id}")
         return playlist
 
 
@@ -187,10 +188,10 @@ def delete_user(user_id: int):
         if user:
             session.delete(user)
             session.commit()
-            print(f"✅ Пользователь {user.username} удален")
+            print(f"Пользователь {user.username} удален")
             return True
         else:
-            print(f"❌ Пользователь с ID {user_id} не найден")
+            print(f"Пользователь с ID {user_id} не найден")
             return False
 
 def delete_genre(genre_id: int):
@@ -200,10 +201,10 @@ def delete_genre(genre_id: int):
         if genre:
             session.delete(genre)
             session.commit()
-            print(f"✅ Жанр {genre.name} удален")
+            print(f"Жанр {genre.name} удален")
             return True
         else:
-            print(f"❌ Жанр с ID {genre_id} не найден")
+            print(f"Жанр с ID {genre_id} не найден")
             return False
 
 def delete_artist(artist_id: int):
@@ -213,10 +214,10 @@ def delete_artist(artist_id: int):
         if artist:
             session.delete(artist)
             session.commit()
-            print(f"✅ Артист {artist.name} удален")
+            print(f"Артист {artist.name} удален")
             return True
         else:
-            print(f"❌ Артист с ID {artist_id} не найден")
+            print(f"Артист с ID {artist_id} не найден")
             return False
 
 def delete_album(album_id: int):
@@ -226,10 +227,10 @@ def delete_album(album_id: int):
         if album:
             session.delete(album)
             session.commit()
-            print(f"✅ Альбом {album.title} удален")
+            print(f"Альбом {album.title} удален")
             return True
         else:
-            print(f"❌ Альбом с ID {album_id} не найден")
+            print(f"Альбом с ID {album_id} не найден")
             return False
 
 def delete_song(song_id: int):
@@ -239,10 +240,10 @@ def delete_song(song_id: int):
         if song:
             session.delete(song)
             session.commit()
-            print(f"✅ Песня {song.title} удалена")
+            print(f"Песня {song.title} удалена")
             return True
         else:
-            print(f"❌ Песня с ID {song_id} не найдена")
+            print(f"Песня с ID {song_id} не найдена")
             return False
 
 def delete_playlist(playlist_id: int):
@@ -252,10 +253,10 @@ def delete_playlist(playlist_id: int):
         if playlist:
             session.delete(playlist)
             session.commit()
-            print(f"✅ Плейлист {playlist.title} удален")
+            print(f"Плейлист {playlist.title} удален")
             return True
         else:
-            print(f"❌ Плейлист с ID {playlist_id} не найден")
+            print(f"Плейлист с ID {playlist_id} не найден")
             return False
 
 
@@ -269,10 +270,10 @@ def update_user(user_id: int, **kwargs):
                     setattr(user, key, value)
             session.add(user)
             session.commit()
-            print(f"✅ Пользователь {user.username} обновлен")
+            print(f"Пользователь {user.username} обновлен")
             return user
         else:
-            print(f"❌ Пользователь с ID {user_id} не найден")
+            print(f"Пользователь с ID {user_id} не найден")
             return None
 
 def update_song(song_id: int, **kwargs):
@@ -285,10 +286,10 @@ def update_song(song_id: int, **kwargs):
                     setattr(song, key, value)
             session.add(song)
             session.commit()
-            print(f"✅ Песня {song.title} обновлена")
+            print(f"Песня {song.title} обновлена")
             return song
         else:
-            print(f"❌ Песня с ID {song_id} не найдена")
+            print(f"Песня с ID {song_id} не найдена")
             return None
 
 
