@@ -1,7 +1,3 @@
-"""
-Файл с запросами к базе данных для музыкальной системы
-Использует SQLModel для работы с базой данных
-"""
 
 from sqlmodel import SQLModel, Session, select
 from models import *

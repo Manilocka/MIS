@@ -21,7 +21,7 @@ def init_data():
 
         artist1 = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=1)
         artist2 = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=2)
-        artist3 = Artist(name="Ivan Kpop", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=2)
+        artist3 = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=2)
         session.add_all([artist1, artist2, artist3])
         session.commit()
         
@@ -34,7 +34,7 @@ def init_data():
         
    
         song1 = Song(title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
-        song2 = Song(title="ivan paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
+        song2 = Song(title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
         song3 = Song(title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
         session.add_all([song1, song2, song3])
         session.commit()

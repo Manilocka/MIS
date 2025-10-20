@@ -296,14 +296,17 @@
                     loadSongs();
                     loadAlbums();
                     loadGenres();
+                    loadAlbumsForSelect();
                     break;
                 case 'albums':
                     loadAlbums();
                     loadArtists();
+                    loadArtistsForSelect();
                     break;
                 case 'playlists':
                     loadPlaylists();
                     loadUsers();
+                    loadUsersForSelect();
                     break;
                 case 'genres':
                     loadGenres();
@@ -387,6 +390,53 @@
                 displaySongs(songs);
             } catch (error) {
                 showError('Ошибка загрузки песен: ' + error.message);
+            }
+        }
+        async function loadUsersForSelect() {
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+                const users = await response.json();
+                const select = document.getElementById('playlistUser');
+                if (select) {
+                    select.innerHTML = '<option value="">Выберите пользователя</option>';
+                    users.forEach(user => {
+                        select.innerHTML += `<option value="${user.user_id}">${user.username}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+            }
+        }
+
+        async function loadArtistsForSelect() {
+            try {
+                const response = await fetch(`${API_BASE}/artists`);
+                const artists = await response.json();
+                const select = document.getElementById('albumArtist');
+                if (select) {
+                    select.innerHTML = '<option value="">Выберите артиста</option>';
+                    artists.forEach(artist => {
+                        select.innerHTML += `<option value="${artist.artist_id}">${artist.name}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки артистов:', error);
+            }
+        }
+
+        async function loadAlbumsForSelect() {
+            try {
+                const response = await fetch(`${API_BASE}/albums`);
+                const albums = await response.json();
+                const select = document.getElementById('songAlbum');
+                if (select) {
+                    select.innerHTML = '<option value="">Выберите альбом</option>';
+                    albums.forEach(album => {
+                        select.innerHTML += `<option value="${album.album_id}">${album.title}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки альбомов:', error);
             }
         }
         
@@ -692,6 +742,157 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadUsers();
+        });
+        // Обработчик формы артиста
+        document.getElementById('artistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const artistData = {
+                name: document.getElementById('artistName').value,
+                bio: document.getElementById('artistBio').value || null,
+                photo_url: document.getElementById('artistPhoto').value || null,
+                genre_id: document.getElementById('artistGenre').value || null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/artists`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(artistData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Артист добавлен');
+                    document.getElementById('artistForm').reset();
+                    loadArtists();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        });
+
+        // Обработчик формы песни
+        document.getElementById('songForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const songData = {
+                title: document.getElementById('songTitle').value,
+                duration: parseInt(document.getElementById('songDuration').value),
+                file_url: document.getElementById('songFileUrl').value,
+                bitrate: document.getElementById('songBitrate').value ? parseInt(document.getElementById('songBitrate').value) : null,
+                release_date: document.getElementById('songReleaseDate').value || null,
+                album_id: document.getElementById('songAlbum').value || null,
+                genre_id: document.getElementById('songGenre').value || null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(songData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Песня добавлена');
+                    document.getElementById('songForm').reset();
+                    loadSongs();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        });
+
+        // Обработчик формы альбома
+        document.getElementById('albumForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const albumData = {
+                title: document.getElementById('albumTitle').value,
+                cover_art_url: document.getElementById('albumCover').value || null,
+                release_date: document.getElementById('albumReleaseDate').value || null,
+                artist_id: document.getElementById('albumArtist').value || null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/albums`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(albumData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Альбом добавлен');
+                    document.getElementById('albumForm').reset();
+                    loadAlbums();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        });
+
+        // Обработчик формы плейлиста
+        document.getElementById('playlistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const playlistData = {
+                title: document.getElementById('playlistTitle').value,
+                description: document.getElementById('playlistDescription').value || null,
+                cover_image_url: document.getElementById('playlistCover').value || null,
+                created_date: document.getElementById('playlistCreatedDate').value || null,
+                user_id: document.getElementById('playlistUser').value || null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/playlists`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(playlistData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Плейлист добавлен');
+                    document.getElementById('playlistForm').reset();
+                    loadPlaylists();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        });
+
+        // Обработчик формы жанра
+        document.getElementById('genreForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const genreData = {
+                name: document.getElementById('genreName').value,
+                description: document.getElementById('genreDescription').value || null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/genres`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(genreData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Жанр добавлен');
+                    document.getElementById('genreForm').reset();
+                    loadGenres();
+                } else {
+                    const error = await response.json();
+                    showError('Ошибка: ' + error.detail);
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
         });
     </script>
 </body>
