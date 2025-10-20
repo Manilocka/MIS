@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 from models import *
-from requests import DatabaseRequests
+from db_requests import DatabaseRequests
 from database import engine
 
 
@@ -371,4 +371,4 @@ if __name__ == "__main__":
     init_data()
     
  
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
