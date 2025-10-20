@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Музыкальная система</title>
     
-    <!-- Material UI CSS -->
+   
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
@@ -27,7 +27,7 @@
             <div class="tab" onclick="showTab('genres')">Жанры</div>
         </div>
         
-        <!-- Пользователи -->
+       
         <div id="users" class="tab-content active">
             <div class="card">
                 <div class="card-header">Добавить пользователя</div>
@@ -67,7 +67,7 @@
             </div>
         </div>
         
-        <!-- Артисты -->
+        
         <div id="artists" class="tab-content">
             <div class="card">
                 <div class="card-header">Добавить артиста</div>
@@ -105,7 +105,7 @@
             </div>
         </div>
         
-        <!-- Песни -->
+        
         <div id="songs" class="tab-content">
             <div class="card">
                 <div class="card-header">Добавить песню</div>
@@ -269,9 +269,9 @@
     <script>
         const API_BASE = '';
         
-        // Управление табами
+        
         function showTab(tabName) {
-            // Скрыть все табы
+            
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -279,11 +279,11 @@
                 tab.classList.remove('active');
             });
             
-            // Показать выбранный таб
+        
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
             
-            // Загрузить данные для таба
+         
             switch(tabName) {
                 case 'users':
                     loadUsers();
@@ -311,7 +311,7 @@
             }
         }
         
-        // Загрузка пользователей
+       
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_BASE}/users`);
@@ -345,7 +345,7 @@
             container.innerHTML = html;
         }
         
-        // Загрузка артистов
+      
         async function loadArtists() {
             try {
                 const response = await fetch(`${API_BASE}/artists`);
@@ -379,7 +379,7 @@
             container.innerHTML = html;
         }
         
-        // Загрузка песен
+     
         async function loadSongs() {
             try {
                 const response = await fetch(`${API_BASE}/songs`);
@@ -415,7 +415,7 @@
             container.innerHTML = html;
         }
         
-        // Загрузка альбомов
+       
         async function loadAlbums() {
             try {
                 const response = await fetch(`${API_BASE}/albums`);
@@ -449,7 +449,7 @@
             container.innerHTML = html;
         }
         
-        // Загрузка плейлистов
+       
         async function loadPlaylists() {
             try {
                 const response = await fetch(`${API_BASE}/playlists`);
@@ -483,7 +483,7 @@
             container.innerHTML = html;
         }
         
-        // Загрузка жанров
+      
         async function loadGenres() {
             try {
                 const response = await fetch(`${API_BASE}/genres`);
@@ -517,7 +517,7 @@
             container.innerHTML = html;
         }
         
-        // Заполнение селектов
+   
         function populateGenreSelects(genres) {
             const selects = ['artistGenre', 'songGenre'];
             selects.forEach(selectId => {
@@ -531,7 +531,7 @@
             });
         }
         
-        // Обработчики форм
+        
         document.getElementById('userForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userData = {
@@ -563,7 +563,7 @@
             }
         });
         
-        // Функции удаления
+      
         async function deleteUser(userId) {
             if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
                 try {
@@ -672,7 +672,7 @@
             }
         }
         
-        // Утилиты
+    
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
@@ -689,7 +689,7 @@
             setTimeout(() => successDiv.remove(), 3000);
         }
         
-        // Инициализация
+        
         document.addEventListener('DOMContentLoaded', () => {
             loadUsers();
         });
