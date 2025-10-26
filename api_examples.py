@@ -1,7 +1,7 @@
 from db_requests import DatabaseRequests
 from datetime import datetime
 
-def test_api():
+def test_methods():
 
     db = DatabaseRequests()
 
@@ -75,5 +75,6 @@ def test_api():
     except Exception as e:
         print(f"Ошибка: {e}")
 
+
 if __name__ == "__main__":
-    test_api()
+    test_methods()

@@ -235,9 +235,9 @@ class DatabaseRequests:
             return session.get(Song, song_id)
     
     def get_songs_by_artist(self, artist_id: int) -> List[Song]:
-        """Получить песни артиста"""
+        """Получить песни артиста (явный join по условию)"""
         with Session(self.engine) as session:
-            statement = select(Song).join(Album).where(Album.artist_id == artist_id)
+            statement = select(Song).join(Album, Song.album_id == Album.id).where(Album.artist_id == artist_id)
             return session.exec(statement).all()
     
     def get_songs_by_genre(self, genre_id: int) -> List[Song]:

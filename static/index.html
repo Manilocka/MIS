@@ -329,9 +329,7 @@
     <script>
         const API_BASE = '';
         
-        
         function showTab(tabName) {
-            
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -339,34 +337,31 @@
                 tab.classList.remove('active');
             });
             
-        
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
             
-         
             switch(tabName) {
                 case 'users':
                     loadUsers();
+                    loadUsersForSelect();  // If needed for other selects
                     break;
                 case 'artists':
                     loadArtists();
-                    loadGenres();
+                    loadGenresForSelect();  // Existing
                     break;
                 case 'songs':
                     loadSongs();
-                    loadAlbums();
-                    loadGenres();
-                    loadAlbumsForSelect();
+                    loadAlbumsForSelect();  // Existing (for songAlbum select)
+                    loadGenresForSelect();  // Existing (for songGenre select)
+                    loadArtistsForSelect();  // ADD THIS LINE to load artists for searchArtistSongs
                     break;
                 case 'albums':
                     loadAlbums();
-                    loadArtists();
-                    loadArtistsForSelect();
+                    loadArtistsForSelect();  // Existing (for albumArtist select)
                     break;
                 case 'playlists':
                     loadPlaylists();
-                    loadUsers();
-                    loadUsersForSelect();
+                    loadUsersForSelect();  // Existing
                     break;
                 case 'genres':
                     loadGenres();
@@ -481,6 +476,24 @@
                 }
             } catch (error) {
                 console.error('Ошибка загрузки артистов:', error);
+            }
+        }
+        async function loadGenresForSelect() {
+            try {
+                const response = await fetch(`${API_BASE}/genres`);
+                const genres = await response.json();
+                const selects = ['artistGenre', 'songGenre'];
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    if (select) {
+                        select.innerHTML = '<option value="">Выберите жанр</option>';
+                        genres.forEach(genre => {
+                            select.innerHTML += `<option value="${genre.genre_id}">${genre.name}</option>`;
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки жанров:', error);
             }
         }
 
@@ -800,8 +813,18 @@
         }
         
         
+        // Initial loads on page ready
         document.addEventListener('DOMContentLoaded', () => {
+            loadArtistsForSelect();  // Load artists for searchArtistSongs, albumArtist, etc.
+            loadGenresForSelect();   // Load genres for songGenre, artistGenre, etc.
+            loadAlbumsForSelect();   // Load albums for songAlbum
+            loadUsersForSelect();    // Load users for playlistUser, searchUserPlaylists, etc.
+            loadSongs();             // Load initial songs list for the songs tab
+            loadGenres();
             loadUsers();
+            loadAlbums();
+            loadPlaylists();
+        
         });
         // Обработчик формы артиста
         document.getElementById('artistForm').addEventListener('submit', async (e) => {
