@@ -62,12 +62,13 @@
                 <div class="card-header">Список пользователей</div>
                 <div class="card-content">
                     <button class="btn" onclick="loadUsers()">Обновить список</button>
+                    <button class="btn" onclick="showUserLikesTab()">Просмотреть лайки пользователей</button>
                     <div id="usersList"></div>
                 </div>
             </div>
         </div>
-        
-        
+
+
         <div id="artists" class="tab-content">
             <div class="card">
                 <div class="card-header">Добавить артиста</div>
@@ -104,8 +105,8 @@
                 </div>
             </div>
         </div>
-        
-        
+
+
         <div id="songs" class="tab-content">
             <div class="card">
                 <div class="card-header">Добавить песню</div>
@@ -155,8 +156,38 @@
                     <div id="songsList"></div>
                 </div>
             </div>
+            
+            <!-- НОВАЯ КАРТОЧКА - Поиск песен по артисту -->
+            <div class="card">
+                <div class="card-header">Поиск песен по артисту</div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label>Выберите артиста:</label>
+                        <select id="searchArtistSongs">
+                            <option value="">Выберите артиста</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="searchSongsByArtist()">Найти песни</button>
+                    <div id="songsSearchResults"></div>
+                </div>
+            </div>
+            
+            <!-- НОВАЯ КАРТОЧКА - Лайкнутые песни пользователя -->
+            <div class="card">
+                <div class="card-header">Лайкнутые песни пользователя</div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label>Выберите пользователя:</label>
+                        <select id="searchUserLikes">
+                            <option value="">Выберите пользователя</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="searchUserLikes()">Показать лайки</button>
+                    <div id="userLikesResults"></div>
+                </div>
+            </div>
         </div>
-        
+
         <!-- Альбомы -->
         <div id="albums" class="tab-content">
             <div class="card">
@@ -193,8 +224,23 @@
                     <div id="albumsList"></div>
                 </div>
             </div>
+            
+            <!-- НОВАЯ КАРТОЧКА - Поиск альбомов по артисту -->
+            <div class="card">
+                <div class="card-header">Поиск альбомов по артисту</div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label>Выберите артиста:</label>
+                        <select id="searchArtistAlbums">
+                            <option value="">Выберите артиста</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="searchAlbumsByArtist()">Найти альбомы</button>
+                    <div id="albumsSearchResults"></div>
+                </div>
+            </div>
         </div>
-        
+
         <!-- Плейлисты -->
         <div id="playlists" class="tab-content">
             <div class="card">
@@ -235,8 +281,23 @@
                     <div id="playlistsList"></div>
                 </div>
             </div>
+            
+            <!-- НОВАЯ КАРТОЧКА - Поиск плейлистов по пользователю -->
+            <div class="card">
+                <div class="card-header">Поиск плейлистов по пользователю</div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label>Выберите пользователя:</label>
+                        <select id="searchUserPlaylists">
+                            <option value="">Выберите пользователя</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="searchPlaylistsByUser()">Найти плейлисты</button>
+                    <div id="playlistsSearchResults"></div>
+                </div>
+            </div>
         </div>
-        
+
         <!-- Жанры -->
         <div id="genres" class="tab-content">
             <div class="card">
@@ -264,7 +325,6 @@
                 </div>
             </div>
         </div>
-    </div>
     
     <script>
         const API_BASE = '';
@@ -894,6 +954,244 @@
                 showError('Ошибка: ' + error.message);
             }
         });
+        async function searchSongsByArtist() {
+            const artistId = document.getElementById('searchArtistSongs').value;
+            if (!artistId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs/artist/${artistId}`);
+                const songs = await response.json();
+                displaySearchResults(songs, 'songsSearchResults', 'Песни артиста');
+            } catch (error) {
+                showError('Ошибка поиска песен: ' + error.message);
+            }
+        }
+
+        async function searchAlbumsByArtist() {
+            const artistId = document.getElementById('searchArtistAlbums').value;
+            if (!artistId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/albums/artist/${artistId}`);
+                const albums = await response.json();
+                displaySearchResults(albums, 'albumsSearchResults', 'Альбомы артиста');
+            } catch (error) {
+                showError('Ошибка поиска альбомов: ' + error.message);
+            }
+        }
+
+        async function searchPlaylistsByUser() {
+            const userId = document.getElementById('searchUserPlaylists').value;
+            if (!userId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/playlists/user/${userId}`);
+                const playlists = await response.json();
+                displaySearchResults(playlists, 'playlistsSearchResults', 'Плейлисты пользователя');
+            } catch (error) {
+                showError('Ошибка поиска плейлистов: ' + error.message);
+            }
+        }
+
+        function displaySearchResults(items, containerId, title) {
+            const container = document.getElementById(containerId);
+            if (!items || items.length === 0) {
+                container.innerHTML = `<p>${title} не найдены</p>`;
+                return;
+            }
+            
+            let html = `<h3>${title}</h3><table class="table"><thead><tr>`;
+            
+            // Определяем заголовки в зависимости от типа данных
+            if (items[0].title && items[0].duration) { // Песни
+                html += '<th>Название</th><th>Длительность</th><th>Действия</th>';
+                html += '</tr></thead><tbody>';
+                items.forEach(item => {
+                    const duration = Math.floor(item.duration / 60) + ':' + (item.duration % 60).toString().padStart(2, '0');
+                    html += `<tr>
+                        <td>${item.title}</td>
+                        <td>${duration}</td>
+                        <td>
+                            <button class="btn" onclick="likeSong(${item.song_id})">Поставить лайк</button>
+                            <button class="btn btn-danger" onclick="deleteSong(${item.song_id})">Удалить</button>
+                        </td>
+                    </tr>`;
+                });
+            } else if (items[0].title && items[0].release_date) { // Альбомы
+                html += '<th>Название</th><th>Дата выпуска</th><th>Действия</th>';
+                html += '</tr></thead><tbody>';
+                items.forEach(item => {
+                    html += `<tr>
+                        <td>${item.title}</td>
+                        <td>${item.release_date || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deleteAlbum(${item.album_id})">Удалить</button>
+                        </td>
+                    </tr>`;
+                });
+            } else if (items[0].title && items[0].description) { // Плейлисты
+                html += '<th>Название</th><th>Описание</th><th>Действия</th>';
+                html += '</tr></thead><tbody>';
+                items.forEach(item => {
+                    html += `<tr>
+                        <td>${item.title}</td>
+                        <td>${item.description || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletePlaylist(${item.playlist_id})">Удалить</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+    async function likeSong(songId) {
+        const userId = prompt('Введите ID пользователя для лайка:');
+        if (!userId) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/users/${userId}/like/${songId}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                showSuccess('Песня лайкнута!');
+            } else {
+                const error = await response.json();
+                showError('Ошибка: ' + error.detail);
+            }
+        } catch (error) {
+            showError('Ошибка: ' + error.message);
+        }
+    }
+
+    async function searchUserLikes() {
+        const userId = document.getElementById('searchUserLikes').value;
+        if (!userId) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/users/${userId}/likes`);
+            const songs = await response.json();
+            displayUserLikes(songs, 'userLikesResults');
+        } catch (error) {
+            showError('Ошибка загрузки лайков: ' + error.message);
+        }
+    }
+
+    function displayUserLikes(songs, containerId) {
+        const container = document.getElementById(containerId);
+        if (!songs || songs.length === 0) {
+            container.innerHTML = '<p>Лайкнутые песни не найдены</p>';
+            return;
+        }
+        
+        let html = '<h3>Лайкнутые песни</h3><table class="table"><thead><tr><th>Название</th><th>Длительность</th><th>Действия</th></tr></thead><tbody>';
+        
+        songs.forEach(song => {
+            const duration = Math.floor(song.duration / 60) + ':' + (song.duration % 60).toString().padStart(2, '0');
+            html += `<tr>
+                <td>${song.title}</td>
+                <td>${duration}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="unlikeSong(${song.song_id}, ${document.getElementById('searchUserLikes').value})">Убрать лайк</button>
+                </td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    async function unlikeSong(songId, userId) {
+        if (!confirm('Убрать лайк с этой песни?')) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/users/${userId}/like/${songId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                showSuccess('Лайк убран');
+                searchUserLikes(); // Обновляем список
+            } else {
+                showError('Ошибка удаления лайка');
+            }
+        } catch (error) {
+            showError('Ошибка: ' + error.message);
+        }
+    }
+    async function loadArtistsForSelect() {
+        try {
+            const response = await fetch(`${API_BASE}/artists`);
+            const artists = await response.json();
+            
+            // Для формы альбома
+            const albumSelect = document.getElementById('albumArtist');
+            if (albumSelect) {
+                albumSelect.innerHTML = '<option value="">Выберите артиста</option>';
+                artists.forEach(artist => {
+                    albumSelect.innerHTML += `<option value="${artist.artist_id}">${artist.name}</option>`;
+                });
+            }
+            
+            // Для поиска песен по артисту
+            const searchSongsSelect = document.getElementById('searchArtistSongs');
+            if (searchSongsSelect) {
+                searchSongsSelect.innerHTML = '<option value="">Выберите артиста</option>';
+                artists.forEach(artist => {
+                    searchSongsSelect.innerHTML += `<option value="${artist.artist_id}">${artist.name}</option>`;
+                });
+            }
+            
+            // Для поиска альбомов по артисту
+            const searchAlbumsSelect = document.getElementById('searchArtistAlbums');
+            if (searchAlbumsSelect) {
+                searchAlbumsSelect.innerHTML = '<option value="">Выберите артиста</option>';
+                artists.forEach(artist => {
+                    searchAlbumsSelect.innerHTML += `<option value="${artist.artist_id}">${artist.name}</option>`;
+                });
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки артистов:', error);
+        }
+    }
+
+    async function loadUsersForSelect() {
+        try {
+            const response = await fetch(`${API_BASE}/users`);
+            const users = await response.json();
+            
+            // Для формы плейлиста
+            const playlistSelect = document.getElementById('playlistUser');
+            if (playlistSelect) {
+                playlistSelect.innerHTML = '<option value="">Выберите пользователя</option>';
+                users.forEach(user => {
+                    playlistSelect.innerHTML += `<option value="${user.user_id}">${user.username}</option>`;
+                });
+            }
+            
+            // Для поиска плейлистов по пользователю
+            const searchPlaylistsSelect = document.getElementById('searchUserPlaylists');
+            if (searchPlaylistsSelect) {
+                searchPlaylistsSelect.innerHTML = '<option value="">Выберите пользователя</option>';
+                users.forEach(user => {
+                    searchPlaylistsSelect.innerHTML += `<option value="${user.user_id}">${user.username}</option>`;
+                });
+            }
+            
+            // Для поиска лайков по пользователю
+            const searchLikesSelect = document.getElementById('searchUserLikes');
+            if (searchLikesSelect) {
+                searchLikesSelect.innerHTML = '<option value="">Выберите пользователя</option>';
+                users.forEach(user => {
+                    searchLikesSelect.innerHTML += `<option value="${user.user_id}">${user.username}</option>`;
+                });
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки пользователей:', error);
+        }
+    }
     </script>
 </body>
 </html>

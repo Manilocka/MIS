@@ -1,13 +1,66 @@
 
-from sqlmodel import SQLModel, Session, select
+from sqlmodel import Session, select
 from models import *
 from typing import List, Optional
-import json
+from sqlmodel import create_engine
 
-from database import engine
+
+engine = create_engine("sqlite:///./music_db.sqlite")
 
 class DatabaseRequests:
     """Класс для работы с запросами к базе данных"""
+
+        
+    def create_db_and_tables():
+        SQLModel.metadata.create_all(engine)
+
+    def init_data():
+        with Session(engine) as session:
+
+            existing_genres = session.exec(select(Genre)).first()
+            if existing_genres:
+                print("Данные уже существуют, пропускаем инициализацию")
+                return
+            
+
+            pop = Genre(name="Pop", description="Popular music")
+            kpop = Genre(name="Kpop", description="Korean popular music")
+            session.add_all([pop, kpop])
+            session.commit()
+            
+
+            artist1 = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=1)
+            artist2 = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=2)
+            artist3 = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=2)
+            session.add_all([artist1, artist2, artist3])
+            session.commit()
+            
+    
+            album1 = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=1)
+            album2 = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=2)
+            album3 = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=3)
+            session.add_all([album1, album2, album3])
+            session.commit()
+            
+    
+            song1 = Song(title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
+            song2 = Song(title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
+            song3 = Song(title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
+            session.add_all([song1, song2, song3])
+            session.commit()
+            
+        
+            user1 = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
+            user2 = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
+            user3 = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
+            session.add_all([user1, user2, user3])
+            session.commit()
+
+        
+            playlist1 = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=1)
+            session.add(playlist1)
+            session.commit()        
+            
     
     def __init__(self):
         self.engine = engine

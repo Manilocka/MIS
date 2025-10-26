@@ -4,14 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from sqlmodel import SQLModel, create_engine, Session, select
-from typing import List, Optional
+from typing import List
 import uvicorn
 from datetime import datetime
 
+from db_requests import engine
 
 from models import *
 from db_requests import DatabaseRequests
-from database import engine
 
 
 app = FastAPI(
@@ -366,9 +366,8 @@ async def read_root():
 
 
 if __name__ == "__main__":
-   
-    from db import init_data
-    init_data()
+
+    db_requests.init_data()
     
  
     uvicorn.run(app, host="0.0.0.0", port=8000)
