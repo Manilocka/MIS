@@ -13,15 +13,16 @@ class DatabaseRequests:
         
     def create_db_and_tables():
         SQLModel.metadata.create_all(engine)
-
-    def init_data():
+    
+    def __init__(self):
+        self.engine = engine
         with Session(engine) as session:
 
             existing_genres = session.exec(select(Genre)).first()
             if existing_genres:
                 print("Данные уже существуют, пропускаем инициализацию")
                 return
-            
+            print("Инициализация данных...")
 
             pop = Genre(name="Pop", description="Popular music")
             kpop = Genre(name="Kpop", description="Korean popular music")
@@ -43,9 +44,9 @@ class DatabaseRequests:
             session.commit()
             
     
-            song1 = Song(title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
-            song2 = Song(title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
-            song3 = Song(title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
+            song1 = Song(artist_id=1, title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
+            song2 = Song(artist_id=2, title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
+            song3 = Song(artist_id=3, title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
             session.add_all([song1, song2, song3])
             session.commit()
             
@@ -60,10 +61,9 @@ class DatabaseRequests:
             playlist1 = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=1)
             session.add(playlist1)
             session.commit()        
-            
-    
-    def __init__(self):
-        self.engine = engine
+            print("Инициализация данных завершена.")
+
+
 
     
     def get_all_users(self) -> List[User]:
@@ -235,9 +235,9 @@ class DatabaseRequests:
             return session.get(Song, song_id)
     
     def get_songs_by_artist(self, artist_id: int) -> List[Song]:
-        """Получить песни артиста (явный join по условию)"""
+        """Получить песни артиста"""
         with Session(self.engine) as session:
-            statement = select(Song).join(Album, Song.album_id == Album.id).where(Album.artist_id == artist_id)
+            statement = select(Song).join(Album, Song.album_id == Album.album_id).where(Album.artist_id == artist_id)
             return session.exec(statement).all()
     
     def get_songs_by_genre(self, genre_id: int) -> List[Song]:

@@ -42,6 +42,7 @@ class Album(SQLModel, table=True):
 class Song(SQLModel, table=True):
     __tablename__ = "songs"
     song_id: int = Field(default=None, primary_key=True)
+    artist_id: int = Field(default=None, foreign_key="artists.artist_id")
     title: str
     duration: int
     file_url: str

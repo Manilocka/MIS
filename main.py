@@ -367,7 +367,5 @@ async def read_root():
 
 if __name__ == "__main__":
 
-    db_requests.init_data()
-    
- 
+    db_requests.init_data() 
     uvicorn.run(app, host="0.0.0.0", port=8000)
