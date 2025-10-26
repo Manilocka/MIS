@@ -9,6 +9,22 @@ import uvicorn
 from datetime import datetime
 
 from db_requests import engine
+import threading
+
+# Run tests on startup in a background thread so the server still starts promptly
+def _run_tests_background():
+    try:
+        import pytest
+
+        def _runner():
+            # run tests from the tests directory; don't block main thread
+            pytest.main(["-q", "tests"])  # output goes to the process stdout
+
+        t = threading.Thread(target=_runner, daemon=True)
+        t.start()
+    except Exception:
+        # If pytest isn't available or something goes wrong, don't prevent app startup
+        pass
 
 from models import *
 from db_requests import DatabaseRequests
@@ -34,6 +50,12 @@ SQLModel.metadata.create_all(engine)
 
 
 db_requests = DatabaseRequests()
+
+
+@app.on_event("startup")
+async def run_tests_on_startup():
+    # Avoid blocking the event loop; start tests in background
+    _run_tests_background()
 
 
 

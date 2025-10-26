@@ -30,37 +30,37 @@ class DatabaseRequests:
             session.commit()
             
 
-            artist1 = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=1)
-            artist2 = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=2)
-            artist3 = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=2)
-            session.add_all([artist1, artist2, artist3])
-            session.commit()
-            
-    
-            album1 = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=1)
-            album2 = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=2)
-            album3 = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=3)
-            session.add_all([album1, album2, album3])
-            session.commit()
-            
-    
-            song1 = Song(artist_id=1, title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=1, genre_id=1)
-            song2 = Song(artist_id=2, title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=2, genre_id=2)
-            song3 = Song(artist_id=3, title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=3, genre_id=2)
-            session.add_all([song1, song2, song3])
-            session.commit()
-            
-        
-            user1 = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
-            user2 = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
-            user3 = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
-            session.add_all([user1, user2, user3])
+            luka_artist = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=pop.genre_id)
+            hyuona_artist = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=kpop.genre_id)
+            ivan_artist = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=kpop.genre_id)
+            session.add_all([luka_artist, hyuona_artist, ivan_artist])
             session.commit()
 
-        
-            playlist1 = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=1)
-            session.add(playlist1)
-            session.commit()        
+
+            round5_album = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=luka_artist.artist_id)
+            bside_album = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=hyuona_artist.artist_id)
+            ivan_album = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=ivan_artist.artist_id)
+            session.add_all([round5_album, bside_album, ivan_album])
+            session.commit()
+
+
+            ruler_of_my_heart_song = Song(artist_id=luka_artist.artist_id, title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=round5_album.album_id, genre_id=pop.genre_id)
+            paratise_song = Song(artist_id=ivan_artist.artist_id, title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=ivan_album.album_id, genre_id=kpop.genre_id)
+            all_in_song = Song(artist_id=hyuona_artist.artist_id, title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=bside_album.album_id, genre_id=kpop.genre_id)
+            session.add_all([ruler_of_my_heart_song, paratise_song, all_in_song])
+            session.commit()
+
+
+            stacy_user = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
+            diana_user = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
+            jessica_user = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
+            session.add_all([stacy_user, diana_user, jessica_user])
+            session.commit()
+
+
+            stacy_playlist = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=stacy_user.user_id)
+            session.add(stacy_playlist)
+            session.commit()
             print("Инициализация данных завершена.")
 
 
