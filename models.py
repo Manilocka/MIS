@@ -1,98 +1,151 @@
-from sqlmodel import Field, SQLModel
+# models.py
+from sqlmodel import SQLModel, Field
+from typing import Optional
+from uuid import UUID, uuid4
+from datetime import datetime, date
+
+# Схема
+SCHEMA = "Ragozina"
+
+class Base(SQLModel):
+    metadata = SQLModel.metadata
+    metadata.schema = SCHEMA
 
 
-# class Base(SQLModel, table=False):
-#     __table_args__ = {"schema": "karma"}
-class User(SQLModel, table=True):
+# ==============================
+# USER
+# ==============================
+class User(Base, table=True):
     __tablename__ = "users"
-    user_id: int = Field(default=None, primary_key=True)
-    email: str = Field(unique=True, index=True)
-    password: str
-    username: str
-    date_of_birth: str = Field(default=None)
-    country: str = Field(default=None)
-    registration_date: str = Field(default=None)
+
+    user_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    email: str = Field(unique=True, index=True, nullable=False)
+    password: str = Field(nullable=False)
+    username: str = Field(nullable=False)
+    date_of_birth: Optional[date] = None
+    country: Optional[str] = None
+    subscription_type: Optional[str] = None
+    registration_date: datetime = Field(nullable=False)
 
 
-class Genre(SQLModel, table=True):
+# ==============================
+# GENRE
+# ==============================
+class Genre(Base, table=True):
     __tablename__ = "genres"
-    genre_id: int = Field(default=None, primary_key=True)
-    name: str = Field(unique=True, index=True)
-    description: str = Field(default=None)
+
+    genre_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    name: str = Field(unique=True, index=True, nullable=False)
+    description: Optional[str] = None
 
 
-class Artist(SQLModel, table=True):
+# ==============================
+# ARTIST
+# ==============================
+class Artist(Base, table=True):
     __tablename__ = "artists"
-    artist_id: int = Field(default=None, primary_key=True)
-    name: str
-    bio: str = Field(default=None)
-    photo_url: str = Field(default=None)
-    genre_id: int = Field(default=None, foreign_key="genres.genre_id")
+
+    artist_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    name: str = Field(nullable=False)
+    bio: Optional[str] = None
+    photo_url: Optional[str] = None
+    genre_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.genres.genre_id")
 
 
-class Album(SQLModel, table=True):
+# ==============================
+# ALBUM
+# ==============================
+class Album(Base, table=True):
     __tablename__ = "albums"
-    album_id: int = Field(default=None, primary_key=True)
-    title: str
-    cover_art_url: str = Field(default=None)
-    release_date: str = Field(default=None)
-    artist_id: int = Field(default=None, foreign_key="artists.artist_id")
+
+    album_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str = Field(nullable=False)
+    cover_art_url: Optional[str] = None
+    release_date: Optional[date] = None
+    artist_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.artists.artist_id")
 
 
-class Song(SQLModel, table=True):
+# ==============================
+# SONG
+# ==============================
+class Song(Base, table=True):
     __tablename__ = "songs"
-    song_id: int = Field(default=None, primary_key=True)
-    artist_id: int = Field(default=None, foreign_key="artists.artist_id")
-    title: str
-    duration: int
-    file_url: str
-    bitrate: int = Field(default=None)
-    release_date: str = Field(default=None)
-    album_id: int = Field(default=None, foreign_key="albums.album_id")
-    genre_id: int = Field(default=None, foreign_key="genres.genre_id")
+
+    song_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str = Field(nullable=False)
+    duration: int = Field(nullable=False)
+    file_url: str = Field(nullable=False)
+    bitrate: Optional[int] = None
+    release_date: Optional[date] = None
+    album_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.albums.album_id")
+    genre_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.genres.genre_id")
 
 
-class Playlist(SQLModel, table=True):
+# ==============================
+# PLAYLIST
+# ==============================
+class Playlist(Base, table=True):
     __tablename__ = "playlists"
-    playlist_id: int = Field(default=None, primary_key=True)
-    title: str
-    description: str = Field(default=None)
-    cover_image_url: str = Field(default=None)
-    created_date: str = Field(default=None)
-    user_id: int = Field(default=None, foreign_key="users.user_id")
+
+    playlist_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str = Field(nullable=False)
+    description: Optional[str] = None
+    cover_image_url: Optional[str] = None
+    created_date: datetime = Field(nullable=False)
+    user_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.users.user_id")
 
 
-class PlaylistSongs(SQLModel, table=True):
+# ==============================
+# PLAYLIST_SONGS
+# ==============================
+class PlaylistSongs(Base, table=True):
     __tablename__ = "playlist_songs"
-    playlist_id: int = Field(foreign_key="playlists.playlist_id", primary_key=True)
-    song_id: int = Field(foreign_key="songs.song_id", primary_key=True)
-    added_date: str = Field(default=None)
+
+    playlist_id: UUID = Field(foreign_key=f"{SCHEMA}.playlists.playlist_id", primary_key=True)
+    song_id: UUID = Field(foreign_key=f"{SCHEMA}.songs.song_id", primary_key=True)
+    added_date: datetime = Field(nullable=False)
 
 
-class SongArtists(SQLModel, table=True):
+# ==============================
+# SONG_ARTISTS
+# ==============================
+class SongArtists(Base, table=True):
     __tablename__ = "song_artists"
-    song_id: int = Field(foreign_key="songs.song_id", primary_key=True)
-    artist_id: int = Field(foreign_key="artists.artist_id", primary_key=True)
+
+    song_id: UUID = Field(foreign_key=f"{SCHEMA}.songs.song_id", primary_key=True)
+    artist_id: UUID = Field(foreign_key=f"{SCHEMA}.artists.artist_id", primary_key=True)
 
 
-class UserFollows(SQLModel, table=True):
+# ==============================
+# USER_FOLLOWS
+# ==============================
+class UserFollows(Base, table=True):
     __tablename__ = "user_follows"
-    user_id: int = Field(foreign_key="users.user_id", primary_key=True)
-    artist_id: int = Field(foreign_key="artists.artist_id", primary_key=True)
-    follow_date: str = Field(default=None)
+
+    user_id: UUID = Field(foreign_key=f"{SCHEMA}.users.user_id", primary_key=True)
+    artist_id: UUID = Field(foreign_key=f"{SCHEMA}.artists.artist_id", primary_key=True)
+    follow_date: datetime = Field(nullable=False)
 
 
-class UserLikes(SQLModel, table=True):
+# ==============================
+# USER_LIKES
+# ==============================
+class UserLikes(Base, table=True):
     __tablename__ = "user_likes"
-    user_id: int = Field(foreign_key="users.user_id", primary_key=True)
-    song_id: int = Field(foreign_key="songs.song_id", primary_key=True)
-    like_date: str = Field(default=None)
+
+    user_id: UUID = Field(foreign_key=f"{SCHEMA}.users.user_id", primary_key=True)
+    song_id: UUID = Field(foreign_key=f"{SCHEMA}.songs.song_id", primary_key=True)
+    like_date: datetime = Field(nullable=False)
 
 
-class ListeningHistory(SQLModel, table=True):
+# ==============================
+# LISTENING_HISTORY
+# ==============================
+class ListeningHistory(Base, table=True):
     __tablename__ = "listening_history"
-    history_id: int = Field(default=None, primary_key=True)
-    user_id: int = Field(default=None, foreign_key="users.user_id")
-    song_id: int = Field(default=None, foreign_key="songs.song_id")
-    listen_date: str = Field(default=None)
-    listen_duration: int = Field(default=None)
+
+    history_id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.users.user_id")
+    song_id: Optional[UUID] = Field(default=None, foreign_key=f"{SCHEMA}.songs.song_id")
+    listen_date: datetime = Field(nullable=False)
+    listen_duration: Optional[int] = None

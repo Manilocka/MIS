@@ -3,13 +3,14 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import SQLModel, create_engine, Session, select,text
 from typing import List
 import uvicorn
 from datetime import datetime
-
 from db_requests import engine
 import threading
+from contextlib import asynccontextmanager
+
 
 def _run_tests_background():
     try:
@@ -382,8 +383,23 @@ async def read_root():
         return HTMLResponse(content=f.read())
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Создаём схему и таблицы при старте
+    with engine.begin() as conn:
+        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
+        SQLModel.metadata.create_all(engine)
+
+    # Инициализируем данные (если пусто)
+    db = DatabaseRequests()
+    with Session(engine) as session:
+        if not session.exec(select(Genre)).first():
+            db._init_data(session)
+
+    # Запускаем тесты в фоне (раньше был @app.on_event("startup"))
+    _run_tests_background()
+
+    yield
 
 if __name__ == "__main__":
-
-    db_requests.init_data() 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

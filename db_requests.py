@@ -1,68 +1,82 @@
-
+import os
+from dotenv import load_dotenv, dotenv_values
 from sqlmodel import Session, select
 from models import *
 from typing import List, Optional
 from sqlmodel import create_engine
 
+load_dotenv()
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")  
+DB_USER = os.getenv("DB_USER")
+DB_HOST = os.getenv("DB_HOST")
 
-engine = create_engine("sqlite:///./music_db.sqlite")
+
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}")
 
 class DatabaseRequests:
     """Класс для работы с запросами к базе данных"""
 
-        
-    def create_db_and_tables():
-        SQLModel.metadata.create_all(engine)
-    
     def __init__(self):
         self.engine = engine
-        with Session(engine) as session:
 
-            existing_genres = session.exec(select(Genre)).first()
-            if existing_genres:
-                print("Данные уже существуют, пропускаем инициализацию")
-                return
-            print("Инициализация данных...")
+    def _init_data(self, session: Session):
+        print("Инициализация начальных данных...")
 
-            pop = Genre(name="Pop", description="Popular music")
-            kpop = Genre(name="Kpop", description="Korean popular music")
-            session.add_all([pop, kpop])
-            session.commit()
-            
+        # Жанры
+        pop = Genre(name="Pop", description="Popular music")
+        kpop = Genre(name="Kpop", description="Korean popular music")
+        session.add_all([pop, kpop])
+        session.flush()
+        session.refresh(pop)
+        session.refresh(kpop)
 
-            luka_artist = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=pop.genre_id)
-            hyuona_artist = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=kpop.genre_id)
-            ivan_artist = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=kpop.genre_id)
-            session.add_all([luka_artist, hyuona_artist, ivan_artist])
-            session.commit()
+        # Артисты
+        luka = Artist(name="Luka", bio="Pop artist", photo_url="/static/images/luka.jpg", genre_id=pop.genre_id)
+        hyuona = Artist(name="Hyuona", bio="K-pop artist", photo_url="/static/images/hyuona.jpg", genre_id=kpop.genre_id)
+        ivan = Artist(name="Ivan", bio="K-pop artist", photo_url="/static/images/ivan.jpg", genre_id=kpop.genre_id)
+        session.add_all([luka, hyuona, ivan])
+        session.flush()
+        session.refresh(luka)
+        session.refresh(hyuona)
+        session.refresh(ivan)
 
+        # Альбомы
+        round5 = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=luka.artist_id)
+        bside = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=hyuona.artist_id)
+        ivan_album = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=ivan.artist_id)
+        session.add_all([round5, bside, ivan_album])
+        session.flush()
+        session.refresh(round5)
+        session.refresh(bside)
+        session.refresh(ivan_album)
 
-            round5_album = Album(title="Round 5", cover_art_url="/static/images/round5.jpg", release_date="2024-01-01", artist_id=luka_artist.artist_id)
-            bside_album = Album(title="B-Side", cover_art_url="/static/images/B-Side.jpg", release_date="2024-02-01", artist_id=hyuona_artist.artist_id)
-            ivan_album = Album(title="Ivan Album", cover_art_url="/static/images/ivan_album.jpg", release_date="2024-03-01", artist_id=ivan_artist.artist_id)
-            session.add_all([round5_album, bside_album, ivan_album])
-            session.commit()
+        # Песни
+        session.add_all([
+            Song(artist_id=luka.artist_id, title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=round5.album_id, genre_id=pop.genre_id),
+            Song(artist_id=ivan.artist_id, title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=ivan_album.album_id, genre_id=kpop.genre_id),
+            Song(artist_id=hyuona.artist_id, title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=bside.album_id, genre_id=kpop.genre_id),
+        ])
+        session.flush()
 
+        # Пользователь
+        stacy = User(
+            email="stacy@example.com", password="1234", username="i_love_hyuona",
+            date_of_birth="2003-07-03", country="USA", registration_date=datetime.now()
+        )
+        session.add(stacy)
+        session.flush()
+        session.refresh(stacy)
 
-            ruler_of_my_heart_song = Song(artist_id=luka_artist.artist_id, title="Ruler of my heart", duration=219, file_url="/static/music/song1.mp3", bitrate=320, release_date="2024-01-01", album_id=round5_album.album_id, genre_id=pop.genre_id)
-            paratise_song = Song(artist_id=ivan_artist.artist_id, title="Paratise", duration=259, file_url="/static/music/song2.mp3", bitrate=320, release_date="2024-02-01", album_id=ivan_album.album_id, genre_id=kpop.genre_id)
-            all_in_song = Song(artist_id=hyuona_artist.artist_id, title="All in", duration=180, file_url="/static/music/all_in.mp3", bitrate=320, release_date="2024-03-01", album_id=bside_album.album_id, genre_id=kpop.genre_id)
-            session.add_all([ruler_of_my_heart_song, paratise_song, all_in_song])
-            session.commit()
+        # Плейлист
+        session.add(Playlist(
+            title="Alien Stage", description="My favorite songs",
+            cover_image_url="/static/images/alien_stage.jpg",
+            created_date=datetime.now(), user_id=stacy.user_id
+        ))
 
-
-            stacy_user = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
-            diana_user = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
-            jessica_user = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
-            session.add_all([stacy_user, diana_user, jessica_user])
-            session.commit()
-
-
-            stacy_playlist = Playlist(title="Alien Stage", description="My favorite songs", cover_image_url="/static/images/alien_stage.jpg", created_date="2025-01-01", user_id=stacy_user.user_id)
-            session.add(stacy_playlist)
-            session.commit()
-            print("Инициализация данных завершена.")
-
+        session.commit()
+        print("Данные добавлены!")
 
 
     

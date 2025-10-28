@@ -15,6 +15,7 @@ __pycache__/
 .venv/
 venv/
 env/
+.env
 
 # SQLite DB file for local dev
 music_db_sqlite
