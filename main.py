@@ -7,9 +7,11 @@ from sqlmodel import SQLModel, create_engine, Session, select,text
 from typing import List
 import uvicorn
 from datetime import datetime
-from db_requests import engine
+from db_requests import engine, DatabaseRequests
 import threading
 from contextlib import asynccontextmanager
+from models import *
+
 
 
 def _run_tests_background():
@@ -24,14 +26,33 @@ def _run_tests_background():
     except Exception:
         pass
 
-from models import *
-from db_requests import DatabaseRequests
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Запуск приложения...")
+    # Создаём схему и таблицы при старте
+    with engine.begin() as conn:
+        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
+        SQLModel.metadata.create_all(engine)
+
+    # Инициализируем данные (если пусто)
+    print("Попытка инициализации данных...")
+    db = DatabaseRequests()
+    with Session(engine) as session:
+        if not session.exec(select(Genre)).first():
+            db._init_data(session)
+
+    # Запускаем тесты в фоне (раньше был @app.on_event("startup"))
+    print("Запуск тестов в фоне...")
+    _run_tests_background()
+
+    yield
 
 app = FastAPI(
     title="Музыкальная система API",
     description="API для управления музыкальной базой данных",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 
@@ -48,12 +69,6 @@ SQLModel.metadata.create_all(engine)
 
 
 db_requests = DatabaseRequests()
-
-
-@app.on_event("startup")
-async def run_tests_on_startup():
-    _run_tests_background()
-
 
 
 def get_session():
@@ -383,23 +398,6 @@ async def read_root():
         return HTMLResponse(content=f.read())
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Создаём схему и таблицы при старте
-    with engine.begin() as conn:
-        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
-        SQLModel.metadata.create_all(engine)
-
-    # Инициализируем данные (если пусто)
-    db = DatabaseRequests()
-    with Session(engine) as session:
-        if not session.exec(select(Genre)).first():
-            db._init_data(session)
-
-    # Запускаем тесты в фоне (раньше был @app.on_event("startup"))
-    _run_tests_background()
-
-    yield
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

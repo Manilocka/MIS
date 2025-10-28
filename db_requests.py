@@ -59,20 +59,17 @@ class DatabaseRequests:
         ])
         session.flush()
 
-        # Пользователь
-        stacy = User(
-            email="stacy@example.com", password="1234", username="i_love_hyuona",
-            date_of_birth="2003-07-03", country="USA", registration_date=datetime.now()
-        )
-        session.add(stacy)
-        session.flush()
-        session.refresh(stacy)
+        stacy_user = User(email="stacy@example.com", password="1234", username="i_love_hyuona", date_of_birth="2003-07-03", country="USA", registration_date="2025-01-01")
+        diana_user = User(email="diana@example.com", password="1235", username="i_love_ivan", date_of_birth="2001-11-04", country="Canada", registration_date="2025-03-04")
+        jessica_user = User(email="jessica@example.com", password="1235", username="i_love_luka", date_of_birth="2024-09-06", country="USA", registration_date="2025-03-04")
+        session.add_all([stacy_user, diana_user, jessica_user])
+        session.commit()
 
         # Плейлист
         session.add(Playlist(
             title="Alien Stage", description="My favorite songs",
             cover_image_url="/static/images/alien_stage.jpg",
-            created_date=datetime.now(), user_id=stacy.user_id
+            created_date=datetime.now(), user_id=stacy_user.user_id
         ))
 
         session.commit()
